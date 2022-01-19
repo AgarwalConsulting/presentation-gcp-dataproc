@@ -6,7 +6,7 @@ layout: true
 
 class: center, middle
 
-# GCP DataProc
+# GCP Dataproc
 
 Gaurav Agarwal
 
@@ -37,7 +37,7 @@ Dataproc automation helps you create clusters quickly, manage them easily, and s
 ---
 class: center, middle
 
-## What is included in DataProc?
+## What is included in Dataproc?
 
 ---
 class: center, middle
