@@ -287,6 +287,74 @@ class: center, middle
 ---
 class: center, middle
 
+*Challenge*: [Submit a job onto a dataproc cluster](https://github.com/AgarwalConsulting/gcp-training/blob/master/challenges/dataproc/1-create-cluster-and-manage-job.md)
+
+---
+class: center, middle
+
+### Job driver output
+
+.content-credits[https://cloud.google.com/dataproc/docs/guides/driver-output]
+
+---
+class: center, middle
+
+`gcloud dataproc jobs wait ...`
+
+---
+class: center, middle
+
+`--driver-log-levels`
+
+---
+class: center, middle
+
+### Manage Java and Scala dependencies for Apache Spark
+
+.content-credits[https://cloud.google.com/dataproc/docs/guides/manage-spark-dependencies]
+
+---
+class: center, middle
+
+Spark applications often depend on third-party Java or Scala libraries.
+
+---
+class: center, middle
+
+`--properties=spark.jars.packages=[DEPENDENCIES]`
+
+---
+class: center,middle
+
+#### Avoiding dependency conflicts
+
+---
+class: center, middle
+
+Spark application dependencies can conflict with Hadoop's dependencies
+
+---
+
+- Conflict can arise because Hadoop injects its dependencies into the application's classpath, so its dependencies take precedence over the application's dependencies.
+
+- When a conflict occurs, `NoSuchMethodError` or other errors can be generated.
+
+--
+class: center, middle
+
+*Solution*: Create a Shaded uber-JAR
+
+---
+
+- Create a single JAR that contains the application's package and all of its dependencies.
+
+- Relocate the conflicting dependency packages within the uber JAR to prevent their path names from conflicting with those of Hadoop's dependency packages.
+
+- Instead of modifying your code, use a plugin to automatically perform this relocation (aka "shading") as part of the packaging process.
+
+---
+class: center, middle
+
 ## Starting and Stopping Clusters
 
 .content-credits[https://cloud.google.com/dataproc/docs/guides/dataproc-start-stop]
@@ -336,11 +404,6 @@ class: center, middle
   - submit jobs to the cluster
 
   - access notebooks on the cluster using the Dataproc component gateway
-
----
-class: center, middle
-
-*Challenge*: [Submit a job onto a dataproc cluster](https://github.com/AgarwalConsulting/gcp-training/blob/master/challenges/dataproc/1-create-cluster-and-manage-job.md)
 
 ---
 class: center, middle
