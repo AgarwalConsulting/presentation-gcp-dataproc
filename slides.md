@@ -122,12 +122,61 @@ class: center, middle
 ---
 class: center, middle
 
+## Creating and managing labels
+
+.content-credits[https://cloud.google.com/dataproc/docs/guides/creating-managing-labels]
+
+---
+class: center, middle
+
+Apply user labels to Dataproc cluster and job resources in order to group resources and related operations for later filtering and listing.
+
+---
+class: center, middle
+
+*Applying*
+
+```bash
+gcloud dataproc clusters create {args} --labels env=prod,customer=acme
+gcloud dataproc jobs submit {args} --labels env=prod,customer=acme
+```
+
+---
+class: center, middle
+
+*Filtering*
+
+```bash
+gcloud dataproc clusters list \
+    --region=region \
+    --filter="status.state=ACTIVE AND labels.env=prod"
+gcloud dataproc jobs list \
+    --region=region \
+    --filter="status.state=ACTIVE AND labels.customer=acme"
+```
+
+---
+
+### Automatically applied labels
+
+![Auto Labels](assets/images/auto-labels.png)
+
+.image-credits[https://cloud.google.com/dataproc/docs/guides/creating-managing-labels#automatically_applied_labels]
+
+---
+class: center, middle
+
 ## Submitting jobs
 
 ---
 class: center, middle
 
-*Demo*: Scheduling our first job
+*Demo*: Scheduling our first Java based spark job
+
+---
+class: center, middle
+
+*Demo*: Scheduling our first Python based spark job
 
 ---
 class: center, middle
@@ -199,6 +248,99 @@ class: center, middle
 - `--max-concurrent-jobs`
 
 - `--driver-size-mb`
+
+---
+class: center, middle
+
+### Restartable Jobs
+
+.content-credits[https://cloud.google.com/dataproc/docs/concepts/jobs/restartable-jobs]
+
+---
+class: center, middle
+
+Dataproc jobs will not automatically restart on failure.
+
+---
+
+- A job is reported successful if the driver terminates with code 0.
+
+- A job is reported failed if:
+
+  - The driver terminates with a non-zero code more than 4 times in 10 minutes.
+
+  - The driver terminates with a non-zero code, and has exceeded the `max_failures_per_hour` or the `max_failures_total` setting.
+
+- A job will be restarted if the driver exits with a non-zero code, is not thrashing, and is within the `max_failures_per_hour` and `max_failures_total` settings.
+
+---
+class: center, middle
+
+### Job design considerations
+
+---
+
+- Design your jobs to gracefully handle restarting. For example, if your job writes to a directory, your job accommodate the possibility that the directory will exist when the job is restarted.
+
+- Apache Spark streaming jobs that checkpoint can be restarted after failure, but they will not report Yarn status.
+
+---
+class: center, middle
+
+## Starting and Stopping Clusters
+
+.content-credits[https://cloud.google.com/dataproc/docs/guides/dataproc-start-stop]
+
+---
+class: center, middle
+
+Stopping a cluster stops all cluster Compute Engine VMs.
+
+---
+class: center, middle
+
+`gcloud dataproc clusters stop/start ...`
+
+---
+
+- You do not pay for these VMs while they are stopped.
+
+- However, you continue to pay for any associated cluster resources, such as persistent disks.
+
+---
+
+- *Running operations*: If a cluster has running operations (such as update or diagnose operations), the stop request will fail.
+
+- *Running jobs*: If a cluster has running jobs, the stop request will succeed, the VMs will stop, and the running jobs will fail.
+
+- *Stop Response*: When the stop request returns a stop operation to the user or caller in the response, the cluster will be in a STOPPING state, and no further jobs will be allowed to be submitted (SubmitJob requests will fail).
+
+- *Autoscaling*: If you stop a cluster that has autoscaling enabled, the Dataproc autoscaler will stop scaling the cluster. It will resume scaling the cluster once it has been started again. If you enable autoscaling on a stopped cluster, the autoscaling policy will only take effect once the cluster has been started.
+
+---
+
+### Limitations
+
+- You cannot stop:
+
+  - clusters with secondary workers
+
+  - clusters with local ssds
+
+  - clusters with Dataproc Personal Cluster Authentication enabled
+
+- After a cluster is stopped, you cannot:
+
+  - update the cluster
+
+  - submit jobs to the cluster
+
+  - access notebooks on the cluster using the Dataproc component gateway
+
+---
+class: center, middle
+
+*Challenge*: [Submit a job onto a dataproc cluster](https://github.com/AgarwalConsulting/gcp-training/blob/master/challenges/dataproc/1-create-cluster-and-manage-job.md)
 
 ---
 class: center, middle
