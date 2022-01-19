@@ -292,7 +292,22 @@ class: center, middle
 ---
 class: center, middle
 
-### Job driver output
+### Reading logs
+
+---
+class: center, middle
+
+```bash
+gcloud logging read \
+    "resource.type=cloud_dataproc_job \
+    resource.labels.region=cluster-region \
+    resource.labels.job_id=my-job-id"
+```
+
+---
+class: center, middle
+
+### Logging - Job driver output
 
 .content-credits[https://cloud.google.com/dataproc/docs/guides/driver-output]
 
@@ -351,6 +366,28 @@ class: center, middle
 - Relocate the conflicting dependency packages within the uber JAR to prevent their path names from conflicting with those of Hadoop's dependency packages.
 
 - Instead of modifying your code, use a plugin to automatically perform this relocation (aka "shading") as part of the packaging process.
+
+---
+class: center, middle
+
+### Profiling
+
+.content-credits[https://cloud.google.com/dataproc/docs/guides/profiling]
+
+---
+class: center, middle
+
+```bash
+--properties \
+  cloud.profiler.enable=true,cloud.profiler.name=profiler_name,cloud.profiler.service.version=version
+```
+
+---
+class: center, middle
+
+## Dataproc Hadoop Data Storage
+
+.content-credits[https://cloud.google.com/dataproc/docs/concepts/dataproc-hdfs]
 
 ---
 class: center, middle
