@@ -103,6 +103,18 @@ class: center, middle
 ---
 class: center, middle
 
+## Component Gateway for accessing through UI
+
+`--enable-component-gateway`
+
+---
+class: center, middle
+
+*Demo*: Accessing the UI using proxy ssh
+
+---
+class: center, middle
+
 ## Creating a image
 
 .content-credits[https://cloud.google.com/dataproc/docs/guides/dataproc-images]
@@ -161,12 +173,19 @@ class: center, middle
 ---
 class: center, middle
 
+### Managing a job
+
+`gcloud dataproc jobs ...`
+
+---
+class: center, middle
+
 ### Job concurrency
 
 ---
 class: center, middle
 
-Formula
+*Formula*
 
 `max((masterMemoryMb - 3584) / masterMemoryMbPerJob, 5)`
 
