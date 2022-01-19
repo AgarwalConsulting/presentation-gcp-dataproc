@@ -354,7 +354,7 @@ Spark application dependencies can conflict with Hadoop's dependencies
 
 - When a conflict occurs, `NoSuchMethodError` or other errors can be generated.
 
---
+---
 class: center, middle
 
 *Solution*: Create a Shaded uber-JAR
