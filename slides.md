@@ -385,6 +385,13 @@ class: center, middle
 ---
 class: center, middle
 
+![Profiler Options](assets/images/profiler-options.png)
+
+.image-credits[https://cloud.google.com/dataproc/docs/guides/profiling#submit_a_job_with_options]
+
+---
+class: center, middle
+
 ## Dataproc Hadoop Data Storage
 
 .content-credits[https://cloud.google.com/dataproc/docs/concepts/dataproc-hdfs]
