@@ -452,6 +452,197 @@ class: center, middle
 ---
 class: center, middle
 
+## Setting default region
+
+---
+class: center, middle
+
+```bash
+gcloud config set dataproc/region $GOOGLE_CLOUD_REGION
+```
+
+---
+class: center, middle
+
+## Scaling clusters
+
+---
+
+Why scale a Dataproc cluster?
+
+- to increase the number of workers to make a job run faster
+
+- to decrease the number of workers to save money
+
+- to increase the number of nodes to expand available Hadoop Distributed Filesystem (HDFS) storage
+
+---
+
+There are three ways you can scale your Dataproc cluster:
+
+- Use the gcloud command-line tool in the Cloud SDK
+
+- Edit the cluster configuration in the Google Cloud Console
+
+- Use the REST API
+
+---
+class: center, middle
+
+### Scaling down with Graceful Decommissioning
+
+---
+class: center, middle
+
+Dataproc Graceful Decommissioning incorporates [Graceful Decommission of YARN Nodes](https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/GracefulDecommission.html) to finish work in progress on a worker before it is removed from the Cloud Dataproc cluster.
+
+---
+class: center, middle
+
+`--graceful-decommission-timeout`
+
+---
+class: center, middle
+
+### Autoscaling clusters
+
+---
+class: center, middle
+
+Estimating the "right" number of cluster workers (nodes) for a workload is difficult, and a single cluster size for an entire pipeline is often not ideal.
+
+---
+
+Use autoscaling
+
+- on clusters that store data in external services, such as Cloud Storage or BigQuery
+
+- on clusters that process many jobs
+
+- to scale up single-job clusters
+
+- with Enhanced Flexibility Mode for Spark batch jobs
+
+---
+
+Autoscaling is **NOT** recommended with/for:
+
+- *HDFS*: Autoscaling is not intended for scaling on-cluster HDFS
+
+  - HDFS utilization is not a signal for autoscaling.
+
+  - HDFS data is only hosted on primary workers. The number of primary workers must be sufficient to host all HDFS data.
+
+  - Decommissioning HDFS DataNodes can delay the removal of workers. Datanodes copy HDFS blocks to other Datanodes before a worker is removed. Depending on data size and the replication factor, this process can take hours.
+
+---
+
+- *YARN Node Labels*: Autoscaling does not support YARN Node Labels, nor the property dataproc:am.primary_only due to YARN-9088. YARN incorrectly reports cluster metrics when node labels are used.
+
+- *Spark Structured Streaming*: Autoscaling does not support Spark Structured Streaming (see Autoscaling and Spark Structured Streaming).
+
+- *Idle Clusters*: Autoscaling is not recommended for the purpose of scaling a cluster down to minimum size when the cluster is idle. Since creating a new cluster is as fast as resizing one, consider deleting idle clusters and recreating them instead. The following tools support this "ephemeral" model:
+
+  - Use Dataproc Workflows to schedule a set of jobs on a dedicated cluster, and then delete the cluster when the jobs are finished. For more advanced orchestration, use Cloud Composer, which is based on Apache Airflow.
+
+  - For clusters that process ad-hoc queries or externally scheduled workloads, use Cluster Scheduled Deletion to delete the cluster after a specified idle period or duration, or at a specific time.
+
+---
+
+To enable autoscaling on a cluster:
+
+1. Create an autoscaling policy.
+
+2. Either:
+
+  a. Create an autoscaling cluster, or
+
+  b. Enable autoscaling on an existing cluster.
+
+---
+class: center, middle
+
+```bash
+gcloud dataproc autoscaling-policies import ...
+```
+
+---
+class: center, middle
+
+#### Defining and applying an autoscaling policy
+
+.content-credits[https://cloud.google.com/dataproc/docs/reference/rest/v1/projects.locations.autoscalingPolicies]
+
+---
+class: center, middle
+
+```bash
+gcloud dataproc autoscaling-policies import simple-policy
+  --source=examples/dataproc/as-policy/simple.yaml \
+  --region=$GOOGLE_CLOUD_REGION
+```
+
+---
+class: center, middle
+
+`--autoscaling-policy=policy`
+
+---
+class: center, middle
+
+You can update a policy that is being used. The updates immediately affect the autoscaling behavior for all clusters that use the policy.
+
+---
+class: center, middle
+
+#### How autoscaling works
+
+.content-credits[https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/autoscaling#how_autoscaling_works]
+
+---
+class: center, middle
+
+#### Autoscaling configuration recommendations
+
+.content-credits[https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/autoscaling#autoscaling_configuration_recommendations]
+
+---
+
+- Avoid scaling primary workers
+
+  - Primary workers run HDFS Datanodes
+
+- Use [Enhanced Flexibility Mode](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/flex) for Spark batch jobs
+
+  - `dataproc:efm.spark.shuffle`
+
+- Choosing a graceful decommissioning timeout
+
+  - graceful decommissioning timeout should be set to a value longer than the longest job a cluster will process.
+
+- Setting `scaleUpFactor`
+
+  - A good starting point is 0.05 for MapReduce jobs and Spark jobs with dynamic allocation enabled.
+
+- Setting `scaleDownFactor`
+
+  - Set this value to 0.0 to avoid ever scaling down the cluster (for ephemeral clusters)
+
+---
+
+- Picking a cooldown period
+
+  - The recommended practice is to set a policy's `scaleUpMinWorkerFraction` and `scaleDownMinWorkerFraction` to a non-zero value when using a shorter `cooldownPeriod`
+
+- Worker count bounds and group weights
+
+  - Each worker group has `minInstances` and `maxInstances` that configure a hard limit on the size of each group.
+
+  - Weight can almost always be left at the default 1.
+
+---
+class: center, middle
+
 Code
 https://github.com/algogrit/presentation-gcp-dataproc
 
