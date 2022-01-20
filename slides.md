@@ -535,11 +535,13 @@ Autoscaling is **NOT** recommended with/for:
 
   - Decommissioning HDFS DataNodes can delay the removal of workers. Datanodes copy HDFS blocks to other Datanodes before a worker is removed. Depending on data size and the replication factor, this process can take hours.
 
----
-
 - *YARN Node Labels*: Autoscaling does not support YARN Node Labels, nor the property dataproc:am.primary_only due to YARN-9088. YARN incorrectly reports cluster metrics when node labels are used.
 
-- *Spark Structured Streaming*: Autoscaling does not support Spark Structured Streaming (see Autoscaling and Spark Structured Streaming).
+---
+
+Autoscaling is **NOT** recommended with/for:
+
+- *Spark Structured Streaming*: Autoscaling does not support Spark Structured Streaming.
 
 - *Idle Clusters*: Autoscaling is not recommended for the purpose of scaling a cluster down to minimum size when the cluster is idle. Since creating a new cluster is as fast as resizing one, consider deleting idle clusters and recreating them instead. The following tools support this "ephemeral" model:
 
@@ -639,6 +641,121 @@ class: center, middle
   - Each worker group has `minInstances` and `maxInstances` that configure a hard limit on the size of each group.
 
   - Weight can almost always be left at the default 1.
+
+---
+class: center, middle
+
+## Connectors
+
+---
+class: center, middle
+
+### Cloud Storage connector
+
+---
+class: center, middle
+
+The Cloud Storage connector is an [open source Java library](https://github.com/GoogleCloudDataproc/hadoop-connectors/tree/master/gcs) that lets you run Apache Hadoop or Apache Spark jobs directly on data in Cloud Storage, and offers a number of benefits over choosing the Hadoop Distributed File System (HDFS).
+
+---
+class: center, middle
+
+Choosing Cloud Storage alongside the Hadoop Distributed File System (HDFS) has several benefits.
+
+.content-credits[https://cloud.google.com/dataproc/docs/concepts/connectors/cloud-storage#benefits_of_the_connector]
+
+---
+
+- *Direct data access* - Store your data in Cloud Storage and access it directly, with no need to transfer it into HDFS first.
+
+- *HDFS compatibility* - You can store data in HDFS in addition to Cloud Storage, and access it with the connector by using a different file path.
+
+- *Interoperability* - Storing data in Cloud Storage enables seamless interoperability between Spark, Hadoop, and other Google services.
+
+- *Data accessibility* - When you shut down a Hadoop cluster, you still have access to your data in Cloud Storage, unlike HDFS.
+
+- *High data availability* - Data stored in Cloud Storage is highly available and globally replicated without a performance hit.
+
+- *No storage management overhead* - Unlike HDFS, Cloud Storage requires no routine maintenance such as checking the file system, upgrading or rolling back to a previous version of the file system, etc.
+
+- *Quick startup* - In HDFS, a MapReduce job can't start until the NameNode is out of safe mode—a process that can take from a few seconds to many minutes depending on the size and state of your data. With Google Cloud Storage, you can start your job as soon as the task nodes start, leading to significant cost savings over time.
+
+---
+class: center, middle
+
+The Cloud Storage connector is installed by default on all Dataproc cluster nodes under `/usr/local/share/google/dataproc/lib/` directory.
+
+---
+
+If your application depends a connector version that is different from the default connector version deployed on your Dataproc cluster, you must either:
+
+- create a new cluster with the `--metadata GCS_CONNECTOR_VERSION=x.y.z` flag, which will update the connector used by your application to the specified connector version, or
+
+- include and relocate the connector classes and connector dependencies for the version you are using into your application's jar so that the connector version you are using will not conflict with the connector version deployed on your Dataproc cluster.
+
+---
+
+#### Using the GCS connector
+
+There are multiple ways to access data stored in Cloud Storage:
+
+- In a Spark (or PySpark) or Hadoop application using the `gs://` prefix
+
+- The hadoop shell: `hadoop fs -ls gs://bucket/dir/file`
+
+or
+
+- Programmatically. The Cloud Storage connector requires Java 8:
+
+```xml
+<dependency>
+    <groupId>com.google.cloud.bigdataoss</groupId>
+    <artifactId>gcs-connector</artifactId>
+    <version>{insert "hadoopX-X.X.X" connector version number here}</version>
+    <scope>provided</scope>
+    <classifier>shaded</classifier>
+</dependency>
+```
+
+---
+class: center, middle
+
+### BigQuery connector
+
+---
+class: center, middle
+
+The BigQuery connector is a library that enables Spark and Hadoop applications to process data from BigQuery and write data to BigQuery using its native terminology.
+
+---
+class: center, middle
+
+You can use a BigQuery connector to enable programmatic read/write access to BigQuery
+
+---
+
+The following BigQuery connectors are available for use in the Hadoop eco-system:
+
+- [The Spark BigQuery Connector](https://github.com/GoogleCloudDataproc/spark-bigquery-connector) adds a Spark data source, which allows DataFrames to interact directly with BigQuery tables using familiar read and write operations.
+
+- [The Hadoop BigQuery Connector](https://github.com/GoogleCloudDataproc/hadoop-connectors) allows Hadoop mappers and reducers to interact with BigQuery tables using abstracted versions of the InputFormat and OutputFormat classes.
+
+---
+
+Add the connector at runtime using the `--jars` parameter, which can be used with the Dataproc API or `spark-submit`
+
+- If you are using Dataproc image 1.5 and above, add the following parameter:
+
+  - `--jars=gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar`
+
+- If you are using Dataproc image 1.4 or below, add the following parameter:
+
+  - `--jars=gs://spark-lib/bigquery/spark-bigquery-latest.jar`
+
+---
+class: center, middle
+
+*Demo*: [Running spark job with a BQ connector](https://github.com/AgarwalConsulting/gcp-training/tree/master/examples/dataproc/demos/spark-bq.md)
 
 ---
 class: center, middle
