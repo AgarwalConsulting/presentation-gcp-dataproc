@@ -760,6 +760,60 @@ class: center, middle
 ---
 class: center, middle
 
+*Code Walkthrough*: [MapReduce job for BigQuery](https://github.com/AgarwalConsulting/gcp-training/tree/master/examples/dataproc/WordCount.java)
+
+.content-credits[https://cloud.google.com/dataproc/docs/tutorials/bigquery-connector-mapreduce-example]
+
+---
+
+`GsonBigQueryInputFormat` provides Hadoop with the BigQuery objects in a JsonObject format via the following primary operations:
+
+- Using a user-specified query to select BigQuery objects
+
+- Splitting the results of the query evenly among Hadoop nodes
+
+- Parsing the splits into Java objects to pass to the Mapper. The Hadoop Mapper class receives a JsonObject representation of each selected BigQuery object.
+
+---
+
+The `BigQueryInputFormat` class provides access to BigQuery records through an extension of the Hadoop InputFormat class. To use the `BigQueryInputFormat` class:
+
+- Lines must be added to the main Hadoop job to set parameters in the Hadoop configuration.
+
+- The InputFormat class must be set to `GsonBigQueryInputFormat`.
+
+---
+class: center, middle
+
+`IndirectBigQueryOutputFormat` class provides Hadoop with the ability to write JsonObject values directly into a BigQuery table.
+
+---
+class: center, middle
+
+```bash
+--jars=gs://hadoop-lib/bigquery/bigquery-connector-hadoop2-latest.jar
+```
+
+---
+class: center, middle
+
+#### Using Apache Hive on Dataproc
+
+.content-credits[https://cloud.google.com/architecture/using-apache-hive-on-cloud-dataproc]
+
+---
+class: center, middle
+
+### Pub/Sub Lite Connector
+
+---
+class: center, middle
+
+The Pub/Sub Lite Spark Connector supports Pub/Sub Lite as an input source to Apache Spark Structured Streaming in the default micro-batch processing and experimental continuous processing modes.
+
+---
+class: center, middle
+
 Code
 https://github.com/algogrit/presentation-gcp-dataproc
 
